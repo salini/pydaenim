@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>pydaenim : collada viewer</title>
+		
+		
+		<link href="pydaenim_resources/css/smoothness/jquery-ui-1.10.2.custom.min.css" rel="stylesheet" />   
+		<link href="pydaenim_resources/css/evol.colorpicker.css" rel="stylesheet" />  
+		<style>
+			 .ui-dialog  { font-size: 0.75em; }
+			 .dialog_entry {text-align: right; }
+		</style>
+		
+		<!-- - - - - - - - - - - - - - - - - - - - - - -
+		// jQuery UI script, for interface
+		- - - - - - - - - - - - - - - - - - - - - - - -->
+		<script src="pydaenim_resources/jquery/jquery-1.9.1.js"></script>
+		<script src="pydaenim_resources/jquery/jquery-ui-1.10.2.custom.min.js"></script>
+		
+		<script src="pydaenim_resources/jquery/evol.colorpicker.min.js"></script>
+		
+		
+		<!-- - - - - - - - - - - - - - - - - - - - - - -
+		// THREE, for 3D engine
+		- - - - - - - - - - - - - - - - - - - - - - - -->
+		<script src="pydaenim_resources/three/three.min.js"></script>
+		<script src="pydaenim_resources/three/extra/loaders/ColladaLoader.js"></script>
+		<script src="pydaenim_resources/three/extra/controls/TrackballControls.js"></script>
+		<script src="pydaenim_resources/three/extra/Detector.js"></script>
+		<script src="pydaenim_resources/three/extra/libs/stats.min.js"></script>
+		<script src="pydaenim_resources/three/fonts/helvetiker_regular.typeface.js"></script>	
+	</head>
+
+
+
+
+	<body> <!-- BODY -->
+
+		
+		<table style="margin:auto; border-collapse:collapse;">
+		
+			<tr> <!--first line, containing, left: info panel, center: three player, right: three player ctrl-->
+			
+				<td style="vertical-align:top;min-width:400px;">
+					<div id="accordion_three_info" style="margin-right:-2px; margin-top:-2px;">
+						<h3 style="font-size:0.75em;">daenim information</h3>
+						<div style="font-size:0.75em; text-align:right;">
+							<button id="connectionIndicator">webSocket: not connected</button>
+							<div id="div_info">
+								
+							</div>
+							
+							<div id="div_collada_info" style="text-align: left;">
+								
+							</div>
+							
+							<!--<input type="file" id="select_collada_file" name="select collada file" />  for later -->
+						</div>
+					</div>
+				</td>
+				
+				<td style="vertical-align:top; margin-bottom:0px;">
+					<div id="three_player" style="width:800px; height:600px; border:1px black solid;">
+					
+						<div id="three_inside" style="text-align:center; width:100%; height:100%;">
+							three.js display
+						</div>
+						
+					</div>
+					
+					
+					<div id="animation_control" class="ui-widget-header ui-corner-bottom" style="margin-top:0px;">
+							
+						<table width="100%">
+							<tr>
+								<td colspan="3"><div id="animationSlider" style="font-size:0.6em; margin-left:3px; margin-right:5px;"></div></td>
+							</tr>
+							<tr>
+								<td style="text-align:left; width:20%;">
+									<div id="speedSelectionBlock" style="font-size: 0.75em;"> speed x
+									<select name="speedSelection" id="speedSelection" style="text-align:center;">
+										<option value=".1">.1</option>
+										<option value=".2">.2</option>
+										<option value=".5">.5</option>
+										<option value="1." selected>1.</option>
+										<option value="1.5">1.5</option>
+										<option value="2.">2.</option>
+										<option value="5.">5.</option>
+									</select>
+									</div>
+								</td>
+								<td style="text-align:center; width:60%;">
+									<div>
+										<button id="slower">slower</button>
+										<button id="faster">faster</button>
+										<div style="width:20px; display:inline-block;"></div>
+										<button id="playpause">play</button>
+										<button id="stop">stop</button>
+										<div style="width:20px; display:inline-block;"></div>
+										<button id="record">record</button>
+										<button id="snapshot">snapshot</button>
+									</div>
+								</td>
+								<td style="text-align:right; width:20%;">
+									<div id="animationTimeInfo" style="position:relative; right:0px; font-size: 0.75em;">
+										0s (0)
+									</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div id="animation_control_information" class="ui-widget-header ui-corner-bottom" style="margin-left:3px;margin-right:3px;text-align:center;font-size:0.75em;">
+						information toolbar
+					</div>
+					
+				</td>
+				
+				<td style="vertical-align:top;min-width:400px;">
+					<div id="accordion_three_control" style="margin-left:-2px;  margin-top:-2px;">
+						<h3 style="font-size:0.75em;">daenim controls</h3>
+						
+						<div style="font-size:0.75em;">
+						
+							<button id="btn_display_options" style="display:inline-block;">display options</button>
+							<br>
+							<br>
+							
+							<button id="btn_camera">camera options</button>
+							<br>
+							<br>
+							
+							<div style="display:inline-block;">
+								<input type="checkbox" id="check_bgcolor" /><label for="check_bgcolor">background</label>
+							</div>
+							<div style="display:inline-block;">
+								<input id="bgcolor_colorpicker" style="width:100px;"/>
+							</div>
+							<br>
+							<br>
+
+							<div id="collada_display_set" style="display:inline-block;">
+								<input type="checkbox" id="check_grid" checked = "checked" /><label for="check_grid">grid</label>
+								<input type="checkbox" id="check_shapes" checked = "checked" /><label for="check_shapes">shapes</label>
+								<input type="checkbox" id="check_frame" /><label for="check_frame">frame</label>
+								<input type="checkbox" id="check_name" /><label for="check_name">name</label>
+								<input type="checkbox" id="check_inertia" /><label for="check_inertia">inertia</label>
+							</div>
+							
+						</div>
+						
+						
+					</div>
+				</td>
+
+			</tr>
+		</table>
+
+		<div id="dialog_camera" title="Camera information">
+			<form>
+				<fieldset style="text-align: right;">
+					<table style="margin:auto;">
+						<tr>
+							<td style="text-align: left;"> cam pos: </td>
+							<td> x <input type="text" name="pos x" id="cam_pos_x" style="width:100px;" /> </td>
+							<td> y <input type="text" name="pos y" id="cam_pos_y" style="width:100px;" /> </td>
+							<td> z <input type="text" name="pos z" id="cam_pos_z" style="width:100px;" /> </td>
+						</tr>
+						<tr>
+							<td style="text-align: left;"> cam up: </td> 
+							<td> x <input type="text" name="up x" id="cam_up_x" style="width:100px;" /> </td>
+							<td> y <input type="text" name="up y" id="cam_up_y" style="width:100px;" /> </td>
+							<td> z <input type="text" name="up z" id="cam_up_z" style="width:100px;" /> </td>
+							
+						</tr>
+						<tr>
+							<td style="text-align: left;"> cam target: </td>
+							<td> x <input type="text" name="coi x" id="cam_coi_x" style="width:100px;" /> </td>
+							<td> y <input type="text" name="coi y" id="cam_coi_y" style="width:100px;" /> </td>
+							<td> z <input type="text" name="coi z" id="cam_coi_z" style="width:100px;" /> </td>
+						</tr>
+						<tr>
+							<td style="text-align: left;"> fov/near/far: </td>
+							<td> f <input type="text" name="fov" id="cam_fov" style="width:100px;" /> </td>
+							<td> n <input type="text" name="near" id="cam_near" style="width:100px;" /> </td>
+							<td> f <input type="text" name="far" id="cam_far" style="width:100px;" /> </td>
+							
+						</tr>
+					</table>
+				</fieldset>
+			</form>
+		</div>
+		
+		
+		<div id="dialog_display_options" title="Display options">
+			<form>
+				<fieldset style="text-align: right;">
+					<table style="margin:auto;">
+						<tr>
+							<td style="text-align: left;"> window size: </td>
+							<td> w <input type="text" name="window width" id="in_window_width" style="width:100px;" /> </td>
+							<td> h: <input type="text" name="window height" id="in_window_height" style="width:100px;" /> </td>
+						</tr>
+						<tr>
+							<td style="text-align: left;"> grid size: </td>
+							<td> <input type="text" name="grid scale" id="in_grid_scale" style="width:100px;" /> </td>
+						</tr>
+						<tr>
+							<td style="text-align: left;"> name size: </td>
+							<td> <input type="text" name="name scale" id="in_text_scale" style="width:100px;" /> </td>
+						</tr>
+						<tr>
+							<td style="text-align: left;"> frame size: </td>
+							<td> <input type="text" name="frame scale" id="in_frame_scale" style="width:100px;" /> </td>
+						</tr>
+						<tr>
+							<td style="text-align: left;"> inertia size: </td>
+							<td> <input type="text" name="inertia scale" id="in_inertia_scale" style="width:100px;" /> </td>
+						</tr>
+					</table>
+				</fieldset>
+			</form>
+		</div>
+		
+		<!-- - - - - - - - - - - - - - - - - - - - - - -
+		// INIT ALL VARIABLES
+		- - - - - - - - - - - - - - - - - - - - - - - -->
+		<script>
+			var three_inside = document.getElementById( "three_inside" );
+			var three_player = document.getElementById( "three_player" );
+			var div_info     = document.getElementById( "div_info" );
+			
+			var input_collada_file = '';
+			
+			// for the creation of the webSocket; if null, no socket created, else it will instanciate a socket for communicationwith this url
+			var webDaenimSocket = null;
+			
+			// for three.js
+			var model;
+			var camera;
+			var scene;			
+			var renderer;
+			var controls;
+			
+			var stats;
+			var grid;
+			
+			// physics informations
+			var physics_models = [];
+			
+			// animation information
+			var animations = [];
+			var colladaIsAnimated = false;
+			var isPlaying=false;
+			var isRecording = false;
+
+			var animationSpeed = 1.;
+			var animationSpeedOptionLength = 0;
+
+			var timeline = [];
+			var kfAnimations = [];
+			var kfAnimationsLength = 0;
+			var lastTimestamp;
+			var progress = 0;
+			var currentIndex=0;
+			var animationTimeInfo = document.getElementById( "animationTimeInfo" );
+
+			var allModelNodes        = {};
+			var animationMovableNode = [];
+			var animationNodeData    = [];
+			
+			// display options
+			var frame_arrows_scale   = .1;
+			var grid_scale           = 1.;
+			var text_mesh_scale      = .05;
+			var inertia_scale_factor = 10.;
+			
+			var camera_up_vector = [];
+			var grid_up_vector   = [];
+
+			var currentBGColor   = 0;
+			var currentBGOpacity = 0;
+
+			var frame_arrows_geometry = null;
+			var frame_arrows_material = null;
+			var inertia_geometry      = null;
+
+			var list_of_frame_arrows  = null;
+			var list_of_texts         = null;
+			var list_of_shapes        = null;
+			var list_of_inertias      = null;
+
+			
+			
+			$( "#accordion_three_info").hide();
+			$( "#accordion_three_control").hide();
+			$( "#dialog_camera" ).hide();
+			$( "#dialog_display_options" ).hide();
+			$( "#animation_control").hide();
+		</script>
+
+		
+<!-- INSERT USER PARAMETERS HERE -->
+		
+		
+		<!-- - - - - - - - - - - - - - - - - - - - - - -
+		// START RENDERER
+		- - - - - - - - - - - - - - - - - - - - - - - -->
+		<script src="pydaenim_resources/pydaenim_three_info.js"> </script>
+		<script src="pydaenim_resources/pydaenim_three_control.js"> </script>
+		<script src="pydaenim_resources/pydaenim_animation_control.js"> </script>
+		<script src="pydaenim_resources/pydaenim_websocket.js"> </script>
+		<script src="pydaenim_resources/pydaenim_three_display.js"> </script>
+		
+
+	</body>
+
+</html>
+
