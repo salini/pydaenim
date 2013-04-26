@@ -78,7 +78,7 @@ def create_pydaenimViewer_with_websocket(colladaFile, browser=None, **kwargs): #
     ws.listen()
     
     basepath = os.path.dirname(os.path.abspath(colladaFile))
-    recfolder = basepath+os.sep+"wsdaenim_record"
+    recfolder = basepath+os.sep+"pydaenim_record"
     
     
     while 1:
@@ -99,7 +99,7 @@ def create_pydaenimViewer_with_websocket(colladaFile, browser=None, **kwargs): #
                     except TypeError:
                         print msg
                         print "problem while decoding image url, raised TypeError."
-                        #TODO: warn wsdaenimPlayer that the image has not been saved...
+                        #TODO: warn pydaenimViewer that the image has not been saved...
 
             elif json_msg[0] == "start_recording":
                 try:
@@ -116,7 +116,7 @@ def create_pydaenimViewer_with_websocket(colladaFile, browser=None, **kwargs): #
                     except TypeError:
                         print msg
                         print "problem while decoding image url of index "+str(i)+", raised TypeError."
-                        #TODO: warn wsdaenimPlayer that the image has not been saved...
+                        #TODO: warn pydaenimViewer that the image has not been saved...
 
 
 
