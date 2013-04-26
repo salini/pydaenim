@@ -3,3 +3,6 @@ build
 *.pyo
 *.pyc
 
+*.dae
+*.h5
+
