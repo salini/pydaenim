@@ -104,12 +104,12 @@ $(function() {
 		});
 	
 	//when starting, disable all buttons except snapshot
-	$('#animationSlider').slider().slider("disable");
-	$("#speedSelectionBlock").hide();
-	
-	$( "#slower" ).button().button("disable");
-	$( "#faster" ).button().button("disable");
-	$( "#playpause" ).button().button("disable");
-	$( "#stop" ).button().button("disable");
-	$( "#record" ).button().button("disable");
+//	$('#animationSlider').slider().slider("disable");
+//	$("#speedSelectionBlock").hide();
+//	
+//	$( "#slower" ).button().button("disable");
+//	$( "#faster" ).button().button("disable");
+//	$( "#playpause" ).button().button("disable");
+//	$( "#stop" ).button().button("disable");
+//	$( "#record" ).button().button("disable");
 });

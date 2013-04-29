@@ -89,7 +89,6 @@ function set_animation_control_state (isAnimated) {
 		$( "#stop" ).button().button("disable");
 		$( "#record" ).button().button("disable");
 		$( "#snapshot" ).button().button("enable");
-		
 	}
 }
 
