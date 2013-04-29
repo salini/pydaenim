@@ -2,9 +2,10 @@
 
 import pydaenim
 import sys
+import os
 
 if len(sys.argv)==1:
-    pydaenim.get_arguments()
+    pydaenim.get_arguments( os.path.basename(sys.argv[0]) )
     exit()
 
 colladaFile = sys.argv[1] if sys.argv[1][0:2] != "--" else sys.argv[-1]

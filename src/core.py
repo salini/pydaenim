@@ -11,7 +11,7 @@ import shutil
 import json
 
 
-def create_pydaenimViewer(colladaFile, browser=None, **kwargs):
+def create_pydaenimViewer(collada_file, browser=None, **kwargs):
     """
     """
     # SET PATHS ################################################################
@@ -29,14 +29,15 @@ def create_pydaenimViewer(colladaFile, browser=None, **kwargs):
         pass
 
     _check_and_copy(ResourceFolder, TempResourcesFolder) # copy resources
-    shutil.copy(colladaFile, TempApplicationFolder+os.sep+colladaFile) #copy collada file
+    collada_basename = os.path.basename(collada_file)
+    shutil.copy(collada_file, TempApplicationFolder+os.sep+collada_basename) #copy collada file
 
 
     # CREATE USER DEFINED PARAMETERS ###########################################
     html_user_args = []
     html_user_args.append("<script>")
     html_user_args.append("// This script contains all the user defined values //")
-    html_user_args.append("var input_collada_file = '{}';".format(colladaFile))
+    html_user_args.append("var input_collada_file = '{}';".format(collada_basename))
     if "host" in kwargs:
         html_user_args.append("var webDaenimSocket = new WebSocket('ws://{}:{}/');".format(kwargs["host"], kwargs["port"]) )
     if "window" in kwargs:
@@ -66,18 +67,18 @@ from base64 import b64decode
 
 from threading import Timer
 
-def create_pydaenimViewer_with_websocket(colladaFile, browser=None, **kwargs): #, args
+def create_pydaenimViewer_with_websocket(collada_file, browser=None, **kwargs): #, args
     """
     """
     ws = websocket.pydaenimWebSocket("localhost", 5000)
     
     kwargs.update({"host":ws.host, "port":ws.port})
     
-    Timer(0.1, create_pydaenimViewer, (colladaFile, browser), kwargs).start()
+    Timer(0.1, create_pydaenimViewer, (collada_file, browser), kwargs).start()
     
     ws.listen()
     
-    basepath = os.path.dirname(os.path.abspath(colladaFile))
+    basepath  =  os.getcwd() #os.path.dirname(os.path.abspath(collada_file))
     recfolder = basepath+os.sep+"pydaenim_record"
     
     
@@ -170,13 +171,15 @@ def _check_and_copy(src_folder, dst_folder):
 
 
 
-def get_arguments():
+def get_arguments(prog_name=None):
+    if prog_name is None:
+        prog_name = 'daenim.py'
     print """
-pydaenim_player.py [--options] colladaFile.dae
+{0} [--options] colladaFile.dae
  --or --
-pydaenim_player.py colladaFile.dae [--options]
+{0} colladaFile.dae [--options]
 
 options are:
 * --browser wb  : use browser "wb" to display collada file.
 * --window  w h : set display window to width:w and height:h.
-"""
+""".format(prog_name)
