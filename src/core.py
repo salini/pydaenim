@@ -70,7 +70,7 @@ from threading import Timer
 def create_pydaenimViewer_with_websocket(collada_file, browser=None, **kwargs): #, args
     """
     """
-    ws = websocket.pydaenimWebSocket("localhost", 5000)
+    ws = websocket.pydaenimWebSocket("127.0.0.1", 5000)
     
     kwargs.update({"host":ws.host, "port":ws.port})
     

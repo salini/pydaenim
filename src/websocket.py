@@ -12,8 +12,9 @@ from StringIO import StringIO
 
 class pydaenimWebSocket(object):
 
-    def __init__(self, host="localhost", port=5000, timeout=5):
+    def __init__(self, host="127.0.0.1", port=5000, timeout=5):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.s.settimeout(timeout)
         self.s.setblocking(True)
         max_port = port + 5000
