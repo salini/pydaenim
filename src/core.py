@@ -6,9 +6,12 @@
 
 import os
 import webbrowser
+import sys
 import tempfile
 import shutil
 import json
+import subprocess, shlex
+from   collections import OrderedDict
 
 
 def create_pydaenimViewer(collada_file, **kwargs):
@@ -61,13 +64,9 @@ def create_pydaenimViewer(collada_file, **kwargs):
             temFile.writelines(tempHTML)
 
     # RUN BROWSER ##############################################################
-    if "browser" in kwargs:
-        browser = kwargs["browser"]
-    else:
-        browser = None
-    wb = webbrowser.get(_get_cmdline(browser))
-    wb.open(TempApplicationFolder+os.sep+"pydaenim.html", autoraise=True)
-
+    browser = kwargs["browser"] if "browser" in kwargs else None
+    cmd = _get_cmdline(browser, TempApplicationFolder+os.sep+"pydaenim.html")
+    subprocess.Popen(shlex.split(cmd))
 
 
 
@@ -131,36 +130,50 @@ def create_pydaenimViewer_with_websocket(collada_file, **kwargs): #, args
 
 
 
-
-def _get_cmdline(browser):
+def _get_cmdline(browser, htmlfile):
     """
     """
-    _iscmd = webbrowser._iscommand
-    pf    = "C:/Program Files/"
-    pfx86 = "C:/Program Files (x86)/"
-    def _get_cmd_path(pp,wp):
-        return ( (_iscmd(pp) and pp) or (_iscmd(pf+wp) and "'"+pf+wp+"'") or (_iscmd(pfx86+wp) and "'"+pfx86+wp+"'") )
+    iscmd         = webbrowser._iscommand
+    available_cmd = OrderedDict()
+    htmlfile = '"'+htmlfile+'"'
 
-    available_browser = []
-    if browser in ["firefox", None]:
-        available_browser.append(_get_cmd_path("firefox", "Mozilla Firefox/firefox.exe") )
-        
-    if browser in ["chrome", "google-chrome", None]:
-        app_path = _get_cmd_path("google-chrome", "Google/Chrome/Application/chrome.exe")
-        available_browser.append( app_path and app_path+" --allow-file-access-from-files")
-    
-    if browser in ["chromium", "chromium-browser", None]:
-        app_path = _get_cmd_path("chromium-browser", "") #TODO: win path
-        available_browser.append( app_path and app_path+" --allow-file-access-from-files")
-        
-    if browser in ["safari", None]:
-        available_browser.append(_get_cmd_path("safari", "Safari/Safari.exe") )
-        
-    if browser in ["opera", None]:
-        available_browser.append(_get_cmd_path("opera", "Opera/opera.exe") )
-    
+
+    if sys.platform.startswith("linux"):
+        if iscmd("firefox"):
+            available_cmd["firefox"] = "firefox "+htmlfile
+        if iscmd("google-chrome"):
+            available_cmd["chrome"]        = "google-chrome --allow-file-access-from-files "+htmlfile
+            available_cmd["google-chrome"] = "google-chrome --allow-file-access-from-files "+htmlfile
+        if iscmd("chromium-browser"):
+            available_cmd["chromium"]         = "chromium-browser --allow-file-access-from-files "+htmlfile
+            available_cmd["chromium-browser"] = "chromium-browser --allow-file-access-from-files "+htmlfile
+
+    elif sys.platform.startswith("win32"):
+        htmlfile = "file:///"+htmlfile.replace("\\", "/")
+        for prefix in ["C:/Program Files (x86)/", "C:/Program Files/"]:
+            if iscmd(prefix+"Mozilla Firefox/firefox.exe"):
+                available_cmd["firefox"] = prefix+"Mozilla Firefox/firefox.exe "+htmlfile
+            if iscmd(prefix+"Google/Chrome/Application/chrome.exe"):
+                available_cmd["chrome"]        = prefix+"Google/Chrome/Application/chrome.exe --allow-file-access-from-files "+htmlfile
+                available_cmd["google-chrome"] = prefix+"Google/Chrome/Application/chrome.exe --allow-file-access-from-files "+htmlfile
+            if iscmd(prefix+"Safari/Safari.exe"):
+                available_cmd["safari"] = prefix+"Safari/Safari.exe "+htmlfile #websocket seems to block with safari
+
+    elif sys.platform.startswith("darwin"):
+        available_cmd["safari"] = "open -a Safari "+htmlfile
+        if os.path.isdir("/Applications/Firefox.app"):
+            available_cmd["firefox"] = "open -a Firefox "+htmlfile
+        if os.path.isdir("/Applications/Google Chrome.app"):
+            available_cmd["chrome"]        = "open -a \"Google Chrome\" "+htmlfile+" --args --allow-file-access-from-files"
+            available_cmd["google-chrome"] = "open -a \"Google Chrome\" "+htmlfile+" --args --allow-file-access-from-files"
+
+
+    for c in available_cmd:
+        print c
+    if browser is not None and browser.lower() in available_cmd:
+        return available_cmd[browser.lower()]
     try:
-        return next(wb+" %s" for wb in available_browser if wb)
+        return next(cmd for cmd in available_cmd.values() if cmd)
     except:
         print "cannot find web browser. use user command line or default."
         return browser
