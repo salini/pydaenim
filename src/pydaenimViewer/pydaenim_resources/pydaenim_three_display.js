@@ -219,7 +219,14 @@ function create_text_mesh( _text )
 function create_camera()
 {
 	camera = new THREE.PerspectiveCamera( 40, three_inside.clientWidth / three_inside.clientHeight, 0.01, 1000 );
-	camera.position.set( 3, 3, 3 );
+	if (camera_position_vector.length == 3)
+	{
+		camera.position.set(camera_position_vector[0], camera_position_vector[1], camera_position_vector[2] );
+	}
+	else
+	{
+		camera.position.set( 3,3,3 );
+	}
 	if (camera_up_vector.length == 3)
 	{
 		camera.up.set(camera_up_vector[0], camera_up_vector[1], camera_up_vector[2]);
@@ -483,6 +490,11 @@ function init_three_scene() {
 //				controls.staticMoving = true;
 //				controls.dynamicDampingFactor = 0.3;
 //				controls.enabled = true;
+
+	if (camera_target_vector.length == 3)
+	{
+		controls.target.set(camera_target_vector[0], camera_target_vector[1], camera_target_vector[2]);
+	}
 }
 
 

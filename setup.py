@@ -62,7 +62,7 @@ class develop(Command):
 
 setup(name='pydaenim',
 	  version='0.1',
-	  description='daenim player in we browser',
+	  description='daenim player in web browser',
 	  author='Joseph Salini',
 	  author_email='josephsalini@gmail.com',
 	  package_dir={'pydaenim':'src'},

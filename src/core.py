@@ -11,7 +11,7 @@ import shutil
 import json
 
 
-def create_pydaenimViewer(collada_file, browser=None, **kwargs):
+def create_pydaenimViewer(collada_file, **kwargs):
     """
     """
     # SET PATHS ################################################################
@@ -43,6 +43,12 @@ def create_pydaenimViewer(collada_file, browser=None, **kwargs):
     if "window" in kwargs:
         html_user_args.append("three_player.style.width  = '{}px';".format(kwargs["window"][0]) )
         html_user_args.append("three_player.style.height = '{}px';".format(kwargs["window"][1]) )
+    if "cam" in kwargs:
+        html_user_args.append("camera_position_vector = {};".format( list(kwargs["cam"]) ) )
+    if "coi" in kwargs:
+        html_user_args.append("camera_target_vector = {};".format( list(kwargs["coi"]) ) )
+    if "up" in kwargs:
+        html_user_args.append("camera_up_vector = {};".format( list(kwargs["up"]) ) )
     html_user_args.append("</script>")
 
 
@@ -55,6 +61,10 @@ def create_pydaenimViewer(collada_file, browser=None, **kwargs):
             temFile.writelines(tempHTML)
 
     # RUN BROWSER ##############################################################
+    if "browser" in kwargs:
+        browser = kwargs["browser"]
+    else:
+        browser = None
     wb = webbrowser.get(_get_cmdline(browser))
     wb.open(TempApplicationFolder+os.sep+"pydaenim.html", autoraise=True)
 
@@ -67,14 +77,14 @@ from base64 import b64decode
 
 from threading import Timer
 
-def create_pydaenimViewer_with_websocket(collada_file, browser=None, **kwargs): #, args
+def create_pydaenimViewer_with_websocket(collada_file, **kwargs): #, args
     """
     """
     ws = websocket.pydaenimWebSocket("127.0.0.1", 5000)
     
     kwargs.update({"host":ws.host, "port":ws.port})
     
-    Timer(0.1, create_pydaenimViewer, (collada_file, browser), kwargs).start()
+    Timer(0.1, create_pydaenimViewer, (collada_file,), kwargs).start()
     
     ws.listen()
     

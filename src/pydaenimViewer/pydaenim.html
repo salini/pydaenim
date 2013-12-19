@@ -239,7 +239,7 @@
 			// for three.js
 			var model;
 			var camera;
-			var scene;			
+			var scene;
 			var renderer;
 			var controls;
 			
@@ -276,8 +276,10 @@
 			var text_mesh_scale      = .05;
 			var inertia_scale_factor = 10.;
 			
-			var camera_up_vector = [];
-			var grid_up_vector   = [];
+			var camera_position_vector = [];
+			var camera_target_vector   = [];
+			var camera_up_vector       = [];
+			var grid_up_vector         = [];
 
 			var currentBGColor   = 0;
 			var currentBGOpacity = 0;
@@ -301,7 +303,7 @@
 		</script>
 
 		
-<!-- INSERT USER PARAMETERS HERE -->
+		<!-- INSERT USER PARAMETERS HERE -->
 		
 		
 		<!-- - - - - - - - - - - - - - - - - - - - - - -
