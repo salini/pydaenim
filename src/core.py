@@ -168,8 +168,6 @@ def _get_cmdline(browser, htmlfile):
             available_cmd["google-chrome"] = "open -a \"Google Chrome\" "+htmlfile+" --args --allow-file-access-from-files"
 
 
-    for c in available_cmd:
-        print c
     if browser is not None and browser.lower() in available_cmd:
         return available_cmd[browser.lower()]
     try:
